@@ -71,10 +71,21 @@ def registrar(request):
               carr={}
               with open(f'{usuario}.pkl', 'wb') as fp:# o novo dicionário é salvo no arquivo do carrinho.
                 pickle.dump(carr, fp)
-              
+    carro=Carrinho.objects.get(atual='atual')
+    with open(f'{carro}.pkl', 'rb') as fp: 
+            carros = pickle.load(fp)
+    with open('preco.pkl', 'rb') as fp: 
+            precos = pickle.load(fp)
+     
+    total=0
+    lista=[]
+    for pratos in carros.keys():
+             if pratos in precos.keys():
+                lista.append(pratos)
+                price=int(precos[pratos])
+                total+=carros[pratos]*price
     
-    return render (request, 'home.html',{'mensagem': f'Você entrou com o pedido {usuario}'})
-
+    return render (request, 'home.html',{'mensagem3': f'{usuario}','mensagem': f'Você entrou com o pedido {usuario}','preco':total,'lista':lista,'carro':carros})
 def adicionar_prato(request):
     
     pedido = Path('preco.pkl')
@@ -101,7 +112,7 @@ def sair(request):
 
 def ham(request):
      if not Carrinho.objects.filter(atual='atual').exists():
-          return render (request,'home.html',{'mensagem2':'É necessário estar logado em um pedido para adicionar pratos'})
+          return render (request,'home.html',{'mensagem3': f'{carro}','mensagem2':'É necessário estar logado em um pedido para adicionar pratos'})
      else:
         
         carro=Carrinho.objects.get(atual='atual')
@@ -115,12 +126,31 @@ def ham(request):
             carros['hamburguer']=1
             with open(f'{carro}.pkl', 'wb') as fp:
                 pickle.dump(carros, fp)
+
+        if not Carrinho.objects.filter(atual='atual').exists():
+          return render (request,'home.html',{'mensagem':'É necessário estar logado em um pedido para gerenciar o pedido'})
+     
+        carro=Carrinho.objects.get(atual='atual')
+        with open(f'{carro}.pkl', 'rb') as fp: 
+            carros = pickle.load(fp)
+        with open('preco.pkl', 'rb') as fp: 
+            precos = pickle.load(fp)
+     
+        total=0
+        lista=[]
+        for pratos in carros.keys():
+             if pratos in precos.keys():
+                lista.append(pratos)
+                price=int(precos[pratos])
+                total+=carros[pratos]*price
+
                 
-        return render (request,'home.html',{'mensagem2': 'hamurguer adicionado ao pedido'})
+                
+        return render (request,'home.html',{'mensagem3': f'{carro}','mensagem2': 'hamurguer adicionado ao pedido','preco':total,'lista':lista,'carro':carros})
      
     
 def fritas(request):
-     if not Carrinho.objects.filter(identidade=1).exists():
+     if not Carrinho.objects.filter(atual='atual').exists():
           return render (request,'home.html',{'mensagem2':'É necessário estar logado em um pedido para adicionar pratos'})
      else:
         carro=Carrinho.objects.get(atual='atual')
@@ -135,7 +165,25 @@ def fritas(request):
             carros['fritas']=1
             with open(f'{carro}.pkl', 'wb') as fp:
                 pickle.dump(carros, fp)
-        return render (request,'home.html',{'mensagem2': 'fritas adicionado ao pedido'})
+
+        if not Carrinho.objects.filter(atual='atual').exists():
+          return render (request,'home.html',{'mensagem':'É necessário estar logado em um pedido para gerenciar o pedido'})
+     
+     carro=Carrinho.objects.get(atual='atual')
+     with open(f'{carro}.pkl', 'rb') as fp: 
+            carros = pickle.load(fp)
+     with open('preco.pkl', 'rb') as fp: 
+            precos = pickle.load(fp)
+     
+     total=0
+     lista=[]
+     for pratos in carros.keys():
+             if pratos in precos.keys():
+                lista.append(pratos)
+                price=int(precos[pratos])
+                total+=carros[pratos]*price
+        
+     return render (request,'home.html',{'mensagem3': f'{carro}', 'mensagem2': 'fritas adicionado ao pedido','preco':total,'lista':lista,'carro':carros})
      
 def coca(request):
      if not Carrinho.objects.filter(atual='atual').exists():
@@ -154,10 +202,7 @@ def coca(request):
             carros['coca']=1
             with open(f'{carro}.pkl', 'wb') as fp:
                 pickle.dump(carros, fp)
-        return render (request,'home.html',{'mensagem2': 'coca adicionado ao pedido'})
-     
-def ir(request):
-     if not Carrinho.objects.filter(atual='atual').exists():
+        if not Carrinho.objects.filter(atual='atual').exists():
           return render (request,'home.html',{'mensagem':'É necessário estar logado em um pedido para gerenciar o pedido'})
      
      carro=Carrinho.objects.get(atual='atual')
@@ -173,9 +218,28 @@ def ir(request):
                 lista.append(pratos)
                 price=int(precos[pratos])
                 total+=carros[pratos]*price
+     return render (request,'home.html',{'mensagem3': f'{carro}','mensagem2': 'coca adicionado ao pedido','preco':total,'lista':lista,'carro':carros})
+     
+# def ir(request):
+#      if not Carrinho.objects.filter(atual='atual').exists():
+#           return render (request,'home.html',{'mensagem':'É necessário estar logado em um pedido para gerenciar o pedido'})
+     
+#      carro=Carrinho.objects.get(atual='atual')
+#      with open(f'{carro}.pkl', 'rb') as fp: 
+#             carros = pickle.load(fp)
+#      with open('preco.pkl', 'rb') as fp: 
+#             precos = pickle.load(fp)
+     
+#      total=0
+#      lista=[]
+#      for pratos in carros.keys():
+#              if pratos in precos.keys():
+#                 lista.append(pratos)
+#                 price=int(precos[pratos])
+#                 total+=carros[pratos]*price
      
      
-     return render (request,'pedidos.html',{'preco':total,'lista':lista,'carro':carros}) 
+#      return render (request,'pedidos.html',{'preco':total,'lista':lista,'carro':carros}) 
 
 def retirar(request,pratos):
      carro=Carrinho.objects.get(atual='atual')
@@ -200,7 +264,7 @@ def retirar(request,pratos):
                 total+=carros[pratos]*price
      
      
-     return render (request,'pedidos.html',{'preco':total,'lista':lista,'carro':carros})
+     return render (request,'home.html',{'preco':total,'lista':lista,'carro':carros})
 
 def voltar(request):
     return render( request ,'home.html')
@@ -208,10 +272,27 @@ def voltar(request):
 def menu(request):
      with open('preco.pkl', 'rb') as fp: 
             menu = pickle.load(fp)
+     
             
             if len(menu)==3:
                  return render (request,'home.html',{'vazio':'No momento não há outros pratos. Adicione algum!'})
-     return render (request,'home.html',{'menu':menu})
+     if not Carrinho.objects.filter(atual='atual').exists():
+          return render (request,'home.html',{'mensagem':'É necessário estar logado em um pedido para gerenciar o pedido'})
+     
+     carro=Carrinho.objects.get(atual='atual')
+     with open(f'{carro}.pkl', 'rb') as fp: 
+            carros = pickle.load(fp)
+     with open('preco.pkl', 'rb') as fp: 
+            precos = pickle.load(fp)
+     
+     total=0
+     lista=[]
+     for pratos in carros.keys():
+             if pratos in precos.keys():
+                lista.append(pratos)
+                price=int(precos[pratos])
+                total+=carros[pratos]*price
+     return render (request,'home.html',{'menu':menu,'preco':total,'lista':lista,'carro':carros})
 
 def retirar_prato(request,prato):
      with open('preco.pkl', 'rb') as fp: 
@@ -240,8 +321,24 @@ def prato_pedido(request,prato):
             carros[prato]=1
             with open(f'{carro}.pkl', 'wb') as fp:
                 pickle.dump(carros, fp)
+        if not Carrinho.objects.filter(atual='atual').exists():
+          return render (request,'home.html',{'mensagem':'É necessário estar logado em um pedido para gerenciar o pedido'})
+     
+     carro=Carrinho.objects.get(atual='atual')
+     with open(f'{carro}.pkl', 'rb') as fp: 
+            carros = pickle.load(fp)
+     with open('preco.pkl', 'rb') as fp: 
+            precos = pickle.load(fp)
+     
+     total=0
+     lista=[]
+     for pratos in carros.keys():
+             if pratos in precos.keys():
+                lista.append(pratos)
+                price=int(precos[pratos])
+                total+=carros[pratos]*price
         
-        return render (request,'home.html',{'mensagem2': f'{prato} adicionado ao pedido'})
+     return render (request,'home.html',{'mensagem3': f'{carro}','mensagem2': f'{prato} adicionado ao pedido','preco':total,'lista':lista,'carro':carros})
      
 def deletar(request):
      if not Carrinho.objects.filter(atual='atual').exists():

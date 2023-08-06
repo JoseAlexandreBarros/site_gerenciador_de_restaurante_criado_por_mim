@@ -20,12 +20,12 @@
       <form action="{% url 'registrar' %}" method="POST">{% csrf_token %}
         <label style="color:black;font-size:200%">Nome do pedido:</label>
         <input type="text" name="usuario" required>
-        <input  type="submit" name="res" value="nome do pedido">
+        <input  type="submit" name="res" value="salvar">
         <span >{{mensagem}}</span>
       </form>
       
       
-      <a style="color:black;font-size:150%" href="{% url 'ir' %}" class="botao-principal">Gerenciar pedido<span><a style="color:black;font-size:150%;float: right;" href="{% url 'sair' %}">Sair do pedido</a></span></a>
+      <a style="color:black;font-size:150%" href="#" class="botao-principal"><a style="color:black;font-size:150%;float: right;" href="{% url 'sair' %}">Sair do pedido</a></span></a>
       <a style="color:black;font-size:150%" href="{% url 'deletar' %}">Cancelar seu pedido</a>
     </div>
     
@@ -62,11 +62,19 @@
         <p>{{mensagem}}</p>
         {% if reservas %}
           
-            <p>Sua reserva foi feita para {{reservas.nome}}, dia {{reservas.data_reserva}}, no ramo {{reservas.get_locais_display}}, no periodo da {{reservas.get_horarios_display}}</p>
+            <p>Sua reserva foi feita para {{reservas.nome}}, dia {{reservas.data_reserva}}, no local {{reservas.get_locais_display}}, no periodo da {{reservas.get_horarios_display}}</p>
             
         {% endif %}
         <br>
-        
+        <h1 style="color:blue;">Aqui está o pedido {{mensagem3}} e o total a pagar</h1>
+    <!-- <a href="{% url 'voltar' %}">Voltar ao menu</a> -->
+    <p style="color:blue;">O total do pedido é: {{preco}}</p>
+    {% if lista %}
+    {% for prato,num in carro.items %}
+    <p>{{prato}}--quantidade:{{num}}<span><a href="{% url 'retirar' pratos=prato %}"><img src="{%static 'cancel.png'%}" class="media-object  img-responsive img-thumbnail" style="width:20; height:20px;"></a></span></p>
+    <!-- <a href="{% url 'retirar' pratos=prato %}"><img src="{%static 'cancel.png'%}" class="media-object  img-responsive img-thumbnail" style="float: left;width:30; height:30px;"></a> -->
+    {% endfor %}
+    {% endif %}
         
         </div>
     <div id="right">
